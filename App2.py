@@ -74,7 +74,7 @@ def process_cv_files(uploaded_files):
             f.write(uploaded_file.getbuffer())
         temp_files_to_clean.append(temp_file_path)
         
-        st.info(f"Loading and processing: {uploaded_file.name}")
+        #st.info(f"Loading and processing: {uploaded_file.name}")
         loader = PyPDFLoader(temp_file_path)
         
         pages_from_this_cv = loader.load()
@@ -98,7 +98,9 @@ def process_cv_files(uploaded_files):
         )
         chunks_for_this_cv = text_splitter.split_documents(pages_from_this_cv)
         all_chunks.extend(chunks_for_this_cv)
-        
+    if st.session_state.vector_store:
+       st.success("CVs processed and ready for questions! You can now start asking questions below.")
+   
     #    st.info(f"Processed '{uploaded_file.name}' into {len(chunks_for_this_cv)} chunks.")
 
     # Clean up temporary files
@@ -208,7 +210,7 @@ def get_qa_chain(vector_store, chat_history_for_llm=""):
     return qa_chain
 
 # --- Streamlit UI (Main Content) ---
-st.title("📄 CV Filtering Chatbot")
+st.markdown("<h1 style='text-align: center; font-size: 48px;'>🤖 CHATBOT_WITH_YOUR_CVs</h1>", unsafe_allow_html=True)
 st.markdown("Upload multiple CVs (PDFs), process them, and then ask questions about their content using Azure GPT-4.0-mini.")
 
 # Initialize session state variables
