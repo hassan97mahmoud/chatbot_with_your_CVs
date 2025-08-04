@@ -33,14 +33,14 @@ It enables HR professionals, recruiters, and hiring managers to upload multiple 
 
 ## 🛠 Tech Stack
 
-| Layer         | Technology                          |
-|---------------|-------------------------------------|
-| Frontend      | Streamlit                           |
-| LLM           | Azure OpenAI GPT-4.0-mini           |
-| Embeddings    | Azure OpenAI Embeddings             |
-| Vector Store  | Chroma                              |
-| Document Parsing | PyPDFLoader (LangChain)         |
-| Prompt Engineering | ChatPromptTemplate, SystemMessagePromptTemplate |
+| Layer               | Technology                            |
+|---------------------|----------------------------------------|
+| Frontend            | Streamlit                             |
+| LLM                 | Azure OpenAI GPT-4.0-mini             |
+| Embeddings          | Azure OpenAI Embeddings               |
+| Vector Store        | Chroma                                |
+| Document Parsing    | PyPDFLoader (LangChain)               |
+| Prompt Engineering  | ChatPromptTemplate, SystemMessagePromptTemplate |
 
 ---
 
@@ -48,7 +48,7 @@ It enables HR professionals, recruiters, and hiring managers to upload multiple 
 
 Follow these steps to run the project locally:
 
-### 1. Clone the repository
+    1. Clone the repository
 
 ```bash
 git clone https://github.com/hassan97mahmoud/chatbot_with_your_CVs.git
@@ -74,6 +74,15 @@ Choose the appropriate app file and run:
 
 (You can replace App1.py with App2.py or others depending on your project structure)
 )
+
+---
+
+## 🧭 Architecture Diagram
+
+<img src="architecture_diagram.png" alt="Architecture Diagram" width="100%" />
+
+![CV Filtering Chatbot Architecture](architecture_diagram.png)
+
 
 📌 Notes
 Make sure your Azure OpenAI deployment is active and properly configured
