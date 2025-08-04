@@ -1,3 +1,8 @@
+Who has Python and machine learning skills?
+Compare Ahmed and Salma’s education.
+Find someone suitable for a Data Analyst role.
+Who is the most experienced project manager?
+Show all candidates with AWS certification.
 hi
 hello
 get ai engineer
