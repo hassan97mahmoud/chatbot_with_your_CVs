@@ -96,3 +96,8 @@ Avoid uploading resumes with non-standard structures to improve extraction accur
 🤝 Contributions
 Pull requests are welcome. For major changes, please open an issue first to discuss the intended modifications.
 
+License
+This project is private and does not specify a license.
+
+Author
+https://github.com/hassan97mahmoud
