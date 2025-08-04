@@ -1,0 +1,16 @@
+streamlit                         # Web UI framework for interactive apps
+openai                            # OpenAI API client (standard, may be optional if using Azure only)
+langchain                         # Core framework for building LLM applications
+langchain-community               # Includes document loaders like PyPDFLoader
+pypdf                             # Required backend to read PDF files
+python-dotenv                     # Loads environment variables from .env
+qdrant-client                     # Client for Qdrant vector database (used in some variations)
+langchain-openai                  # Azure/OpenAI integration layer for LangChain
+tiktoken                          # Token counter for OpenAI models
+sentence-transformers             # Useful for some vector operations or comparisons
+faiss-cpu                         # Local vector database (used instead of Qdrant for offline mode)
+chromadb                          # Local persistent vector store used by Chroma in LangChain
+
+
+
+
