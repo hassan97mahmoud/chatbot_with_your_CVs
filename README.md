@@ -1,4 +1,4 @@
-# 📄 CV Filtering Chatbot using Google Gemini & LangChain
+# 📄 🤖 CHATBOT_WITH_YOUR_CVs
 
 <div align="center">
 
