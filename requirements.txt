@@ -10,7 +10,7 @@ tiktoken                          # Token counter for OpenAI models
 sentence-transformers             # Useful for some vector operations or comparisons
 faiss-cpu                         # Local vector database (used instead of Qdrant for offline mode)
 chromadb                          # Local persistent vector store used by Chroma in LangChain
-
+langchain-google-genai
 
 
 
