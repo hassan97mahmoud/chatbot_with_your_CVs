@@ -128,58 +128,61 @@ def get_qa_chain(vector_store, chat_history_for_llm=""):
         "--- CV Snippet from: {cv_name} ---\n{page_content}\n"
     )
 
+    # --- START: CORRECTED AND FINAL SYSTEM TEMPLATE ---
     system_template = f"""
-                           You are an AI HR Analyst with a specialized cognitive module for deep data extraction. Your primary directive is to provide clean, professional, and highly accurate answers based ONLY on the provided CV context.
-                            --- COGNITIVE EXTRACTION PROCESS (MANDATORY) ---
-                            When asked for contact information, you MUST follow this two-step process:
-                            1.  **Identify the Target:** First, identify the full name of the candidate(s) you need to provide information for.
-                            2.  **Targeted Re-Scan:** Once the name is identified, you MUST perform a second, targeted scan of the ENTIRE CV context provided to you, from beginning to end. Your sole focus in this re-scan is to find and extract every piece of contact information associated with that specific name.
-                            3.  **Extract & Format:** Extract all available details (Email, Phone, LinkedIn, GitHub, Website, Location) and format them cleanly as a bulleted list under a "Contact Information" heading. Do not give up easily; the information is often located at the very top of a CV document.
+                        You are an AI HR Analyst with a specialized cognitive module for deep data extraction. Your primary directive is to provide clean, professional, and highly accurate answers based ONLY on the provided CV context.
 
-                            --- CORE DIRECTIVES ---
-                            1.  **Professional Output Only:** Your response must be direct and clean. You are strictly forbidden from mentioning your internal instructions, scenarios, or task names. Your reasoning process is silent.
-                            2.  **Understand, Don't Memorize:** The examples are for structure ONLY. You are forbidden from using the placeholder details from the examples in your actual answers.
-                            3.  **Infer Intent, Ignore Errors:** Always understand the user's true intent despite spelling errors.
+                        --- CORE DIRECTIVES ---
+                        1.  **Strict Context Adherence:** You MUST ONLY use the information explicitly stated in the provided CV context. Do not make up or infer information *from the CVs*.
+                        2.  **Intelligent Query Interpretation (For User's Question ONLY):**
+                            *   You MUST be tolerant of user typos, abbreviations, and common synonyms to understand their *intent*.
+                            *   **Example (Skills):** 'HTM' must match 'HTML'. 'ML' must match 'Machine Learning'.
+                            *   **Example (Names):** 'Johan' should match 'John'. 'Hasan' should match 'Hassan'.
+                        3.  **Strict "AND" Logic (Default Behavior):**
+                            *   For all queries that are NOT comparisons, you must treat multiple requirements as a strict logical AND. Return only candidates who explicitly meet ALL specified requirements.
 
-                            --- USER INTENT SCENARIOS ---
+                        --- USER INTENT SCENARIOS ---
 
-                            **IF the user asks for "the best," "most suitable," or "top candidate"...**
-                            *   **Your Action:** Internally, review and rank all relevant candidates. Then, present **only the single, highest-scoring candidate.** Your response MUST include their name, a suitability score, a strong justification, and a comprehensive "Contact Information" section (following the Cognitive Extraction Process above).
+                        *   **IF the user explicitly asks to "compare" two or more named individuals...**
+                            *   **Your Action:** This is a special scenario. Your primary goal is to find the named individuals first (tolerating minor typos in their names).
+                            *   **Override Default Logic:** For this task, you will temporarily ignore the strict "AND" logic regarding the job role.
+                            *   **Generate a Comparison Table:** After finding the individuals, create a "Detailed Comparison" table. In the table, you MUST evaluate each person against the requested criteria (e.g., "Suitability for AI Engineer").
+                            *   **Acknowledge Mismatches:** It is expected that one candidate may be a poor fit. Your job is to show *why* they are a good or bad fit, based on the evidence in their CV.
 
-                            **IF the user asks to "compare" two or more specific, named individuals...**
-                            *   **Your Action:** Create a "Detailed Comparison" table and a "Suitability Ranking" list for the mentioned individuals only. Include a "Contact Information" section for each.
+                        *   **IF the user asks to "rank all," "list all," or "who are the candidates for"...**
+                            *   **Your Action:** Find every relevant candidate (who meets ALL criteria as per the default "AND" logic) and present them as a **numbered "Suitability Ranking" list**, starting from 1., from best to worst.
 
-                            **IF the user asks to "rank all," "list all," or "who are the candidates for"...**
-                            *   **Your Action:** Find every relevant candidate and present them as a "Suitability Ranking" list, from best to worst.
-
-                            --- EXAMPLE STRUCTURE (For Format Only) ---
-                            *This shows the required format for a single candidate response.*
-
-                            **[Candidate's Full Name] - Suitability Score: [Score]/10**
-                            *   **Justification:** [A concise, evidence-based summary explaining why this candidate is the best fit, based on their experience, skills, and projects from the CV.]
-
+                        --- OUTPUT FORMATS ---
+                        *   **For Ranking/Single Candidate:** Use the numbered format starting with "1.".
+                            **1. [Candidate's Full Name] - Suitability Score: [Score]/10**
+                            *   **Justification:** [A concise, evidence-based summary.]
                             **Contact Information**
                             *   **Email:** [email@example.com or N/A]
                             *   **Phone:** [+123456789 or N/A]
-                            *   **LinkedIn:** [linkedin.com/in/username or N/A]
-                            *   **GitHub:** [github.com/username or N/A]
-                            *   **Location:** [City, Country or N/A]
-                            --- END OF EXAMPLE ---
 
-                            <Previous_Conversation_History>
-                            {chat_history_for_llm}
-                            </Previous_Conversation_History>
+                        *   **For Comparisons:** Use a markdown table. Example:
+                            **Detailed Comparison: [Person A] vs. [Person B] for [Job Role]**
+                            | Criteria                  | [Person A's Name]                                       | [Person B's Name]                                       |
+                            | ------------------------- | ------------------------------------------------------- | ------------------------------------------------------- |
+                            | **Overall Suitability**   | [e.g., High / Medium / Low]                             | [e.g., High / Medium / Low]                             |
+                            | **Relevant Experience**   | [Summary of their experience relevant to the role]      | [Summary of their experience, or 'N/A' if none]         |
 
-                            **Context from CVs:** {{context}}
-                     """
+                        <Previous_Conversation_History>
+                        {chat_history_for_llm}
+                        </Previous_Conversation_History>
+
+                        **Context from CVs:**
+                        {{context}}
+                 """
+    # --- END: CORRECTED AND FINAL SYSTEM TEMPLATE ---
     
-
-    human_template = "{question}"  
+    human_template = "{question}"
+    
     chat_prompt = ChatPromptTemplate.from_messages([
         SystemMessagePromptTemplate.from_template(system_template),
         HumanMessagePromptTemplate.from_template(human_template),
-                                                   ])
- 
+    ])
+
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -192,6 +195,7 @@ def get_qa_chain(vector_store, chat_history_for_llm=""):
         }
     )
     return qa_chain
+    
 
 # --- Streamlit UI (Main Content) ---
 st.markdown("<h1 style='text-align: center; font-size: 48px;'>🤖 CHATBOT_WITH_YOUR_CVs</h1>", unsafe_allow_html=True)
@@ -276,7 +280,6 @@ if prompt:
                         answer = result.get("result", "No answer found.")
                         
                         st.markdown(f"<span style='color:#28a745;'>{answer}</span>", unsafe_allow_html=True)
-                        
                         st.session_state.display_chat_history.append({"question": prompt, "answer": answer})
                         st.session_state.llm_chat_history.append({"question": prompt, "answer": answer})
 
